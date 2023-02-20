@@ -1,6 +1,9 @@
 package br.com.jhonatansouza.command
 
+import br.com.jhonatansouza.FunctionalCommand
+
 class CommandWorkerQueue {
+
     private lateinit var jobs: JobHandler
 
     fun initialize(): JobHandler {
@@ -9,24 +12,26 @@ class CommandWorkerQueue {
         return this.jobs
     }
 
-    fun <T> getJobResult(item: Command): T = this.jobs.process
+    fun <T> getJobResult(item: Command<out Any>): T = this.jobs.process
         .first { rtx -> rtx.containsKey(item) }
         .map { this.jobs.process.indexOf(mapOf(it.key to it.value)) }
         .map { index -> this.jobs.result[index].result as T }
         .first()
+
 }
 
 class JobHandler {
 
-    val queue = ArrayList<Map<Command, Any>>()
-    val process = ArrayList<Map<Command, Any>>()
+    val queue = ArrayList<Map<out Command<Any>, Any>>()
+    val process = ArrayList<Map<out Command<*>, *>>()
     val result = ArrayList<CommandResult>()
 
-    fun addJob(item: Command, parameter: Any): JobHandler {
-        val receiver = mapOf(item to parameter)
+    fun withCommand(item: Any, params: Any): JobHandler {
+        val receiver = mapOf(item as Command<Any> to params)
         queue.add(receiver)
         return this
     }
+
 
     fun tearDown(): JobHandler {
         queue.removeAll(queue)
@@ -49,7 +54,8 @@ class JobHandler {
             }.apply {
                 find { it -> !it.isExecuted }
                     ?.apply {
-                        throw exception ?: CommandException("Unable to handle statement-pdf queue. error=$exception")
+                        throw exception
+                            ?: CommandException("Unable to handle {proccess - name} queue. error=$exception")
                     }
             }
         ))

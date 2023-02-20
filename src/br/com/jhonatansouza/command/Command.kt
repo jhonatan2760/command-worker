@@ -1,5 +1,5 @@
 package br.com.jhonatansouza.command
 
-interface Command {
-    fun execute(t: Any): CommandResult
+interface Command<T> {
+    fun execute(t: T): CommandResult
 }
