@@ -1,7 +1,5 @@
 package br.com.jhonatansouza.command
 
-import br.com.jhonatansouza.FunctionalCommand
-
 class CommandWorkerQueue {
 
     private lateinit var jobs: JobHandler
@@ -20,16 +18,26 @@ class CommandWorkerQueue {
 
 }
 
+class ParamsJobHandler(val command: Any, val job: JobHandler){
+
+    private val comand: Any = command
+
+    fun withParam(params: Any): JobHandler{
+        val receiver = mapOf(comand as Command<Any> to params)
+        job.queue.add(receiver)
+        return job
+    }
+
+}
+
 class JobHandler {
 
     val queue = ArrayList<Map<out Command<Any>, Any>>()
     val process = ArrayList<Map<out Command<*>, *>>()
-    val result = ArrayList<CommandResult>()
+    val result = ArrayList<CommandResult<*>>()
 
-    fun withCommand(item: Any, params: Any): JobHandler {
-        val receiver = mapOf(item as Command<Any> to params)
-        queue.add(receiver)
-        return this
+    fun withCommand(item: Any): ParamsJobHandler {
+        return ParamsJobHandler(item, this)
     }
 
 
@@ -43,7 +51,7 @@ class JobHandler {
         return this
     }
 
-    fun execute(): JobHandler {
+    fun execute(): JobResponse {
         result.addAll(ArrayList(queue
             .flatMap { job -> job.entries }
             .map {
@@ -60,6 +68,18 @@ class JobHandler {
             }
         ))
 
-        return this
+        return JobResponse(this, result)
     }
+
+
+}
+
+class JobResponse(val same: JobHandler, val response: MutableList<CommandResult<*>>) {
+
+    fun responseFirst(): Any? {
+        return response.first().result
+    }
+
+    fun then() = same
+
 }

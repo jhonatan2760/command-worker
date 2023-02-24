@@ -1,7 +1,7 @@
 package br.com.jhonatansouza.command
 
-data class CommandResult(
+data class CommandResult<T>(
     var isExecuted: Boolean,
-    val result: Any? = null,
+    val result: T? = null,
     val exception: Exception? = null
 )

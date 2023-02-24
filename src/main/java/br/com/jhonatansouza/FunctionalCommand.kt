@@ -5,6 +5,6 @@ import java.util.function.Consumer
 
 interface FunctionalCommand  {
 
-    fun execute(): CommandResult
+    fun execute(): CommandResult<*>
 
 }
