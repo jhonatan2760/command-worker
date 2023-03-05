@@ -2,39 +2,40 @@ package br.com.jhonatansouza.command
 
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import kotlin.concurrent.thread
 
 class CommandTest {
 
     @Test
-    fun executeCommandAndGetResult() {
+    fun testExecuteInParallel() {
+        val jobHandler = JobHandler()
+        val iterations = 1000
 
-        val sumCommand = SumCommand()
-        val jobs = CommandWorkerQueue()
-        jobs.initialize()
-            .withCommand(sumCommand, 24L)
-            .execute()
+        repeat(iterations) { i ->
+            jobHandler.withCommand(MyCommand(i))
+                .withParam("param$i")
+                .then()
+        }
 
-        assertEquals(48L, jobs.getJobResult(sumCommand))
+        val responses = mutableListOf<JobResponse>()
+        repeat(10) {
+            thread {
+                responses.add(jobHandler.execute())
+            }
+        }
+
+        responses.forEach { response ->
+            assertEquals(iterations, response.response.size)
+            for (i in 0 until iterations) {
+                assertEquals("result$i", response.response[i].result)
+            }
+        }
     }
+
 
 }
-
-class SumCommand : Command<Long> {
-    override fun execute(value: Long): CommandResult {
-        return CommandResult(
-            isExecuted = true,
-            result = (value + value)
-        )
+class MyCommand(val id: Int) : Command<String> {
+    override fun execute(params: String): CommandResult<String> {
+        return CommandResult(isExecuted = true, result = "result$id")
     }
-
-}
-
-class MinusCommand : Command<Long> {
-    override fun execute(value: Long): CommandResult {
-        return CommandResult(
-            isExecuted = true,
-            result = (value - value)
-        )
-    }
-
 }
