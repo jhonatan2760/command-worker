@@ -61,10 +61,10 @@ class JobHandler {
 
     fun getResult() = result
 
-    fun getResult(position: JobPosition): Any? {
+    fun <T : Any> getResult(position: JobPosition, type: Class<T>): T {
         return try {
-            result.get(position.number).result
-        }catch (ex: IndexOutOfBoundsException){
+            result[position.number].result as T
+        } catch (ex: IndexOutOfBoundsException) {
             throw IndexNotFoundException("Index ${position.number} was not processed or found in the results")
         }
     }
@@ -97,4 +97,5 @@ class JobHandler {
 
 class JobResponse(private val same: JobHandler) {
     fun then() = same
+
 }

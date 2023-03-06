@@ -1,41 +1,60 @@
 package br.com.jhonatansouza.command
 
-import junit.framework.TestCase.assertEquals
+import br.com.jhonatansouza.command.enum.JobPosition
+import br.com.jhonatansouza.command.exceptions.IndexNotFoundException
+import org.junit.Assert
+import org.junit.Assert.assertThrows
 import org.junit.Test
-import kotlin.concurrent.thread
 
 class CommandTest {
 
+
     @Test
-    fun testExecuteInParallel() {
-        val jobHandler = JobHandler()
-        val iterations = 1000
+    fun executeCommandAndResultProcessResult() {
+        val namesCommand = NamesCommand()
+        val commadWorker = CommandWorkerQueue().initialize()
 
-        repeat(iterations) { i ->
-            jobHandler.withCommand(MyCommand(i))
-                .withParam("param$i")
-                .then()
+        val command = commadWorker.withCommand(namesCommand)
+            .withParam(Names("Command Worker Test 1", 3))
+            .then().withCommand(NamesCommand())
+            .withParam(Names("Command Worker Test 2", 9))
+            .then()
+            .execute()
+
+        Assert.assertEquals("Command Worker Test 1", command.then().getResult(JobPosition.FIRST, Names::class.java).name )
+    }
+
+    @Test
+    fun assertThrowsIndexNotFoundException() {
+        val namesCommand = NamesCommand()
+        val commadWorker = CommandWorkerQueue().initialize()
+
+        val command = commadWorker.withCommand(namesCommand)
+            .withParam(Names("Command Worker Test 1", 3))
+            .then().withCommand(NamesCommand())
+            .withParam(Names("Command Worker Test 2", 9))
+            .then()
+            .execute()
+
+        assertThrows(IndexNotFoundException::class.java) {
+            command.then().getResult(JobPosition.THIRD)
         }
 
-        val responses = mutableListOf<JobResponse>()
-        repeat(10) {
-            thread {
-                responses.add(jobHandler.execute())
-            }
-        }
-
-        responses.forEach { response ->
-            assertEquals(iterations, response.response.size)
-            for (i in 0 until iterations) {
-                assertEquals("result$i", response.response[i].result)
-            }
-        }
     }
 
 
 }
-class MyCommand(val id: Int) : Command<String> {
-    override fun execute(params: String): CommandResult<String> {
-        return CommandResult(isExecuted = true, result = "result$id")
+
+class NamesCommand() : Command<Names> {
+
+    override fun execute(t: Names): CommandResult<Names> {
+        return CommandResult(
+            result = t,
+            isExecuted = true
+        )
     }
+
 }
+
+
+data class Names(val name: String, val age: Int)
