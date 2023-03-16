@@ -19,9 +19,12 @@ fun main(args: Array<String>) {
 
     val result =   CommandWorkerQueue().initialize()
         .withCommand(SumCommand())
-        .withParam(40.0).execute()
+        .withParam(40.0)
+        .withCommand(SumCommand())
+        .withParam(99.9)
+        .execute()
 
-    println(result.then().getResult())
+    println(result.then().getResult(JobPosition.SECOND, Double::class.java))
 }
 
 class SumCommand : Command<Double>{

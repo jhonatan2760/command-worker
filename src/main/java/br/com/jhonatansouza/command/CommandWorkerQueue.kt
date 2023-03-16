@@ -39,8 +39,8 @@ class ParamsJobHandler(private val command: Any, private val job: JobHandler,pri
 
 class WithJoHandler(private val command: Any, private val job: JobHandler,private val queue: ArrayList<Map<out Command<Any>, Any>>){
 
-    fun withParam(params: Any): ParamsJobHandler {
-        return ParamsJobHandler(command,job,queue)
+    fun withCommand(command: Any): ParamsJobHandler {
+        return job.withCommand(command)
     }
 
     fun execute() = job.execute()
