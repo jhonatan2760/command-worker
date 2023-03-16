@@ -37,7 +37,7 @@ class CommandTest {
             .execute()
 
         assertThrows(IndexNotFoundException::class.java) {
-            command.then().getResult(JobPosition.THIRD)
+            command.then().getResult(JobPosition.THIRD, Names::class.java)
         }
 
     }

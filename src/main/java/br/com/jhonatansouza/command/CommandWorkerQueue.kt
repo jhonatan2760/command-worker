@@ -27,20 +27,30 @@ class CommandWorkerQueue {
 
 class ParamsJobHandler(private val command: Any, private val job: JobHandler,private val queue: ArrayList<Map<out Command<Any>, Any>>){
 
-    @Synchronized fun withParam(params: Any): JobHandler{
+    @Synchronized fun withParam(params: Any): WithJoHandler {
         val receiver = mapOf(command as Command<Any> to params)
         synchronized(queue) {
             queue.add(receiver)
         }
-        return job
+        return WithJoHandler(command,job,queue)
     }
+
+}
+
+class WithJoHandler(private val command: Any, private val job: JobHandler,private val queue: ArrayList<Map<out Command<Any>, Any>>){
+
+    fun withParam(params: Any): ParamsJobHandler {
+        return ParamsJobHandler(command,job,queue)
+    }
+
+    fun execute() = job.execute()
 
 }
 
 class JobHandler {
 
-    private val queue = ArrayList<Map<out Command<Any>, Any>>()
-    private val process = ArrayList<Map<out Command<*>, *>>()
+    private val queue  = ArrayList<Map<out Command<Any>, Any>>()
+    private val process  = ArrayList<Map<out Command<*>, *>>()
     private val result = ArrayList<CommandResult<*>>()
 
     @Synchronized fun withCommand(item: Any): ParamsJobHandler {

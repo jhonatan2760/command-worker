@@ -13,5 +13,23 @@ class Application
 
 fun main(args: Array<String>) {
 
+    /**
+     * Falta deixar mais idiomatico
+     */
+
+    val result =   CommandWorkerQueue().initialize()
+        .withCommand(SumCommand())
+        .withParam(40.0).execute()
+
+    println(result.then().getResult())
+}
+
+class SumCommand : Command<Double>{
+    override fun execute(t: Double): CommandResult<*> {
+        return CommandResult(
+            result = t + t,
+            isExecuted = true
+        )
+    }
 
 }
