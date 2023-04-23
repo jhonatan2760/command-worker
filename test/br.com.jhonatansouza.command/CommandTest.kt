@@ -16,9 +16,8 @@ class CommandTest {
 
         val command = commadWorker.withCommand(namesCommand)
             .withParam(Names("Command Worker Test 1", 3))
-            .then().withCommand(NamesCommand())
+            .withCommand(NamesCommand())
             .withParam(Names("Command Worker Test 2", 9))
-            .then()
             .execute()
 
         Assert.assertEquals("Command Worker Test 1", command.then().getResult(JobPosition.FIRST, Names::class.java).name )
@@ -31,9 +30,8 @@ class CommandTest {
 
         val command = commadWorker.withCommand(namesCommand)
             .withParam(Names("Command Worker Test 1", 3))
-            .then().withCommand(NamesCommand())
+            .withCommand(NamesCommand())
             .withParam(Names("Command Worker Test 2", 9))
-            .then()
             .execute()
 
         assertThrows(IndexNotFoundException::class.java) {
