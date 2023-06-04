@@ -1,20 +1,21 @@
 package br.com.jhonatansouza.command
 
-import br.com.jhonatansouza.command.enum.JobPosition
+import br.com.jhonatansouza.command.enums.JobPosition
 import br.com.jhonatansouza.command.exceptions.IndexNotFoundException
-import java.lang.IndexOutOfBoundsException
 
 class CommandWorkerQueue {
 
     private lateinit var jobs: JobHandler
 
-    @Synchronized fun initialize(): JobHandler {
+    @Synchronized
+    fun initialize(): JobHandler {
         this.jobs = JobHandler()
         this.jobs.tearDown()
         return this.jobs
     }
 
-    @Synchronized fun <T> getJobResult(item: Command<out Any>): T {
+    @Synchronized
+    fun <T> getJobResult(item: Command<out Any>): T {
         synchronized(this.jobs.getJobs()) {
             return this.jobs.getJobs()
                 .first { rtx -> rtx.containsKey(item) }
@@ -25,19 +26,28 @@ class CommandWorkerQueue {
     }
 }
 
-class ParamsJobHandler(private val command: Any, private val job: JobHandler,private val queue: ArrayList<Map<out Command<Any>, Any>>){
+class ParamsJobHandler(
+    private val command: Any,
+    private val job: JobHandler,
+    private val queue: ArrayList<Map<out Command<Any>, Any>>
+) {
 
-    @Synchronized fun withParam(params: Any): WithJoHandler {
+    @Synchronized
+    fun withParam(params: Any): WithJoHandler {
         val receiver = mapOf(command as Command<Any> to params)
         synchronized(queue) {
             queue.add(receiver)
         }
-        return WithJoHandler(command,job,queue)
+        return WithJoHandler(command, job, queue)
     }
 
 }
 
-class WithJoHandler(private val command: Any, private val job: JobHandler,private val queue: ArrayList<Map<out Command<Any>, Any>>){
+class WithJoHandler(
+    private val command: Any,
+    private val job: JobHandler,
+    private val queue: ArrayList<Map<out Command<Any>, Any>>
+) {
 
     fun withCommand(command: Any): ParamsJobHandler {
         return job.withCommand(command)
@@ -49,15 +59,17 @@ class WithJoHandler(private val command: Any, private val job: JobHandler,privat
 
 class JobHandler {
 
-    private val queue  = ArrayList<Map<out Command<Any>, Any>>()
-    private val process  = ArrayList<Map<out Command<*>, *>>()
+    private val queue = ArrayList<Map<out Command<Any>, Any>>()
+    private val process = ArrayList<Map<out Command<*>, *>>()
     private val result = ArrayList<CommandResult<*>>()
 
-    @Synchronized fun withCommand(item: Any): ParamsJobHandler {
+    @Synchronized
+    fun withCommand(item: Any): ParamsJobHandler {
         return ParamsJobHandler(item, this, this.queue)
     }
 
-    @Synchronized fun tearDown(): JobHandler {
+    @Synchronized
+    fun tearDown(): JobHandler {
         queue.removeAll(queue)
         result.removeAll(result)
         return this
@@ -75,11 +87,12 @@ class JobHandler {
         return try {
             result[position.number].result as T
         } catch (ex: IndexOutOfBoundsException) {
-            throw IndexNotFoundException("Index ${position.number} was not processed or found in the results")
+            throw IndexNotFoundException("Index ${position} was not processed or found in the results")
         }
     }
 
-    @Synchronized fun execute(): JobResponse {
+    @Synchronized
+    fun execute(): JobResponse {
         val results = mutableListOf<CommandResult<*>>()
         synchronized(queue) {
             synchronized(process) {

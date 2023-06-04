@@ -1,12 +1,13 @@
 package br.com.jhonatansouza.command
 
-import br.com.jhonatansouza.command.enum.JobPosition
+import br.com.jhonatansouza.command.enums.JobPosition
 import br.com.jhonatansouza.command.exceptions.IndexNotFoundException
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
-class CommandTest {
+class CommandWorkerQueueTest {
 
 
     @Test
@@ -20,7 +21,10 @@ class CommandTest {
             .withParam(Names("Command Worker Test 2", 9))
             .execute()
 
-        Assert.assertEquals("Command Worker Test 1", command.then().getResult(JobPosition.FIRST, Names::class.java).name )
+        Assert.assertEquals(
+            "Command Worker Test 1",
+            command.then().getResult(JobPosition.FIRST, Names::class.java).name
+        )
     }
 
     @Test
@@ -40,6 +44,33 @@ class CommandTest {
 
     }
 
+    @Test
+    fun assertSearchOfResultOfNotResultingIndexShouldThrowsIndexNotFoundException() {
+        val namesCommand = NamesCommand()
+        val commadWorker = CommandWorkerQueue().initialize()
+
+        val command = commadWorker.withCommand(namesCommand)
+            .withParam(Names("Command Worker Test 1", 3))
+            .withCommand(NamesCommand())
+            .withParam(Names("Command Worker Test 2", 9))
+            .execute()
+
+    }
+
+    @Test
+    fun assertThatAfterTearDownTheResultListShouldBeEmpty() {
+        val namesCommand = NamesCommand()
+        val commadWorker = CommandWorkerQueue().initialize()
+
+        val command = commadWorker.withCommand(namesCommand)
+            .withParam(Names("Command Worker Test 1", 3))
+            .withCommand(NamesCommand())
+            .withParam(Names("Command Worker Test 2", 9))
+            .execute()
+
+        command.then().tearDown();
+        assertEquals(command.then().getResult().isEmpty(), true)
+    }
 
 }
 

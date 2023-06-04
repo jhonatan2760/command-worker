@@ -1,4 +1,4 @@
-package br.com.jhonatansouza.command.enum
+package br.com.jhonatansouza.command.enums
 
 enum class JobPosition(val number: Int) {
 
