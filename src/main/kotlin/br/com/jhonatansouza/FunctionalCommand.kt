@@ -1,6 +1,6 @@
 package br.com.jhonatansouza
 
-import br.com.jhonatansouza.command.CommandResult
+import br.com.jhonatansouza.CommandResult
 
 interface FunctionalCommand {
 

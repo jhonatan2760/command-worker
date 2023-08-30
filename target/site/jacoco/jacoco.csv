@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+command-worker,br.com.jhonatansouza.command.enums,JobPosition,35,0,0,0,4,0,3,0,3,0
+command-worker,br.com.jhonatansouza.command.result,SuccessfulResult,18,0,0,0,1,0,3,0,3,0
+command-worker,br.com.jhonatansouza.command.result,ThrowableResult,18,0,0,0,1,0,3,0,3,0
+command-worker,br.com.jhonatansouza.command.result,UnsuccessfulResult,9,0,0,0,1,0,2,0,2,0
+command-worker,br.com.jhonatansouza.command,CommandException,7,0,0,0,1,0,1,0,1,0
+command-worker,br.com.jhonatansouza.command,CommandWorkerQueue,202,0,20,0,20,0,13,0,3,0
+command-worker,br.com.jhonatansouza.command,ParamsJobHandler,54,0,0,0,8,0,2,0,2,0
+command-worker,br.com.jhonatansouza.command,WithJoHandler,33,0,0,0,6,0,3,0,3,0
+command-worker,br.com.jhonatansouza.command,CommandResult,25,0,0,0,4,0,5,0,5,0
+command-worker,br.com.jhonatansouza.command,JobHandler,319,0,16,0,44,0,16,0,8,0
+command-worker,br.com.jhonatansouza.command,JobResponse,12,0,0,0,2,0,2,0,2,0
+command-worker,br.com.jhonatansouza.command.exceptions,IndexNotFoundException,13,0,0,0,1,0,2,0,2,0
