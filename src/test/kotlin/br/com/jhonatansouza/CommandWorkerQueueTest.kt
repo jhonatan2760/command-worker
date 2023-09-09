@@ -6,6 +6,8 @@ import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoMoreInteractions
 
 class CommandWorkerQueueTest {
 
@@ -54,6 +56,20 @@ class CommandWorkerQueueTest {
             .withCommand(NamesCommand())
             .withParam(Names("Command Worker Test 2", 9))
             .execute()
+
+    }
+
+    @Test
+    fun assertCommandWorkerWillBeExecuted() {
+        val namesCommand = NamesCommand()
+        val commadWorker = CommandWorkerQueue().initialize()
+
+        Assert.assertNotEquals(commadWorker.withCommand(namesCommand)
+            .withParam(Names("Command Worker Test 1", 3))
+            .withCommand(NamesCommand())
+            .withParam(Names("Command Worker Test 2", 9))
+            .execute(), namesCommand)
+
 
     }
 
